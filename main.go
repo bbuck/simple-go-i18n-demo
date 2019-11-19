@@ -21,7 +21,7 @@ var en = map[string]string{
 }
 
 var es = map[string]string{
-	"Home":           "Página de inicio",
+	"Home Page":      "Página de inicio",
 	"Hello":          "Hola",
 	"Hello, {name}!": "¡Hola, %s!",
 }
