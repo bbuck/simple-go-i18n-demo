@@ -11,12 +11,18 @@ import (
 )
 
 var en = map[string]string{
+	"Application":    "Application",
+	"Home":           "Home",
+	"No content.":    "No content.",
 	"Index Page":     "Index Page",
 	"Home Page":      "Home Page",
+	"Hello":          "Hello",
 	"Hello, {name}!": "Hello, %s!",
 }
 
 var es = map[string]string{
+	"Home":           "Página de inicio",
+	"Hello":          "Hola",
 	"Hello, {name}!": "¡Hola, %s!",
 }
 
@@ -34,8 +40,28 @@ var xt *extemplate.Extemplate
 // TemplateData is data for the templates, containing vars and translation
 // mappings.
 type TemplateData struct {
-	Vars map[string]string
-	T    map[string]string
+	vars map[string]string
+	t    map[string]string
+}
+
+// Var returns a variaable from the template data by name.
+func (td *TemplateData) Var(key string) string {
+	return td.vars[key]
+}
+
+// SetVar updates the value of a variable in the template.
+func (td *TemplateData) SetVar(key, value string) {
+	td.vars[key] = value
+}
+
+// MergeTranslations adds a new translation to this template data map.
+func (td *TemplateData) MergeTranslations(tmap map[string]string) {
+	mergeMaps(td.t, tmap)
+}
+
+// T fetches a translation by key from the map
+func (td *TemplateData) T(key string) string {
+	return td.t[key]
 }
 
 func init() {
@@ -59,7 +85,7 @@ func main() {
 	r.Get("/home", TemplateHandler("views/home.tmpl"))
 	r.Get("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
 		data := getTemplateData(r.Context())
-		data.Vars["name"] = chi.URLParam(r, "name")
+		data.SetVar("name", chi.URLParam(r, "name"))
 
 		renderTemplate("views/hello.tmpl", w, data)
 	})
@@ -75,11 +101,11 @@ func InitI18N(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data := getTemplateData(r.Context())
 		// base language data
-		mergeMaps(data.T, en)
+		data.MergeTranslations(en)
 		locale := r.URL.Query().Get("locale")
 		if locale != "en" {
 			if translations, ok := localeMap[locale]; ok {
-				mergeMaps(data.T, translations)
+				data.MergeTranslations(translations)
 			}
 		}
 
@@ -103,8 +129,8 @@ func SetContentType(contentType string) func(http.Handler) http.Handler {
 func InitTemplateData(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data := &TemplateData{
-			Vars: make(map[string]string),
-			T:    make(map[string]string),
+			vars: make(map[string]string),
+			t:    make(map[string]string),
 		}
 
 		ctx := r.Context()

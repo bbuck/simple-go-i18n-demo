@@ -1,8 +1,8 @@
 <html>
 	<head>
-		<title>{{block "title" .}}Default title{{end}}</title>
+		<title>{{block "title" .}}{{ .T "Application" }}{{end}}</title>
 	</head>
 	<body>
-		{{block "content" .}}Default content{{end}}
+		{{block "content" .}}{{ .T "No content." }}{{end}}
 	</body>
 </html>

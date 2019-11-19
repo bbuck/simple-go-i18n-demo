@@ -1,7 +1,7 @@
 {{extends "layouts/application.tmpl"}}
 
-{{define "title"}}Hello{{end}}
+{{define "title"}}{{ .T "Hello" }}{{end}}
 
 {{define "content" -}}
-	<h1>{{ format (index .T "Hello, {name}!") (index .Vars "name") }}</h1>
+	<h1>{{ format (.T "Hello, {name}!") (.Var "name") }}</h1>
 {{end}}
