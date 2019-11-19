@@ -1,0 +1,7 @@
+{{extends "layouts/application.tmpl"}}
+
+{{define "title"}}Hello{{end}}
+
+{{define "content" -}}
+	<h1>{{ format (index .T "Hello, {name}!") (index .Vars "name") }}</h1>
+{{end}}
